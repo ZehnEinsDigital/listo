@@ -25,7 +25,7 @@ def main() -> None:
     bootstrap.load_dotenv()  # pick up LISTO_API_URL from ~/.listo/.env (GUI has no shell env)
     api_url = (os.environ.get("LISTO_API_URL") or bootstrap.DEFAULT_API_URL).strip()
     dest = bootstrap.connect_via_browser(api_url)
-    print(f"LISTO connected: saved to {dest}. Run /listo:create <feed>.")
+    print(f"LISTO connected: saved to {dest}. Just describe what you want to list on Amazon.")
 
 
 if __name__ == "__main__":

@@ -14,6 +14,8 @@ their API key.** Run the browser device-auth flow instead.
 2. It opens the Listo web app and prints a short confirmation code + a URL. Tell the user:
    "I've opened your browser — log in if needed, check the code matches, and click **Authorize**."
 3. The script waits, receives the key automatically, and saves it to `~/.listo/.env`. When it prints
-   "LISTO connected", confirm: "✅ Connected. Run `/listo:create <feed.csv>` to build listings."
+   "LISTO connected", confirm: "✅ Verbunden. Sag mir einfach, was du auf Amazon listen willst — z.B.
+   *„erstelle Listings aus dieser Datei"*. Kein Befehl, kein Ordner nötig." (The create skill auto-triggers
+   on that.)
 
 Never request, display, or write the API key yourself — the browser flow handles it end to end.

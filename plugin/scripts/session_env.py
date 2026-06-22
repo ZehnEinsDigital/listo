@@ -70,6 +70,21 @@ def _load_dotenv(path: pathlib.Path) -> dict:
     return out
 
 
+def _config_env_path(project_dir: str) -> pathlib.Path:
+    """Locate the Listo .env (lk_live_ key). It lives in the ``.listo`` dir next to the engine
+    project — i.e. the project's parent — so it works whether ``.listo`` sits in HOME
+    (``~/.listo/engine``) or inside the user's allowed workspace (``<repo>/.listo/engine``).
+    Falls back to ``~/.listo/.env``.
+    """
+    try:
+        parent_env = pathlib.Path(project_dir).expanduser().resolve().parent / ".env"
+        if parent_env.exists():
+            return parent_env
+    except Exception:
+        pass
+    return pathlib.Path.home() / ".listo" / ".env"
+
+
 def _shim_dir() -> str:
     """Absolute path to the _gateway_shim dir.
 
@@ -91,7 +106,7 @@ def main() -> None:
     if not _is_engine_project(project_dir):
         return
 
-    dotenv = _load_dotenv(pathlib.Path.home() / ".listo" / ".env")
+    dotenv = _load_dotenv(_config_env_path(project_dir))
     api_url = dotenv.get("LISTO_API_URL") or DEFAULT_API_URL
     api_key = dotenv.get("LISTO_API_KEY", "")
 
