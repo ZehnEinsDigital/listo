@@ -154,24 +154,36 @@ def _http_error(e: urllib.error.HTTPError) -> Exception:
 
 
 def _resolve_credential_id() -> str:
-    """Find the Amazon credential id stored in the Listo vault, cached after first call.
+    """Return the credential id pinned for THIS run — never guessing among several.
 
-    Lists ``/v1/credentials`` and picks the entry whose ``marketplace == "amazon"``.
-    Raises a clear ``RuntimeError`` if none exists (the user must store Amazon creds
-    in the Listo vault first).
+    The session picks ONE connection and pins it via ``LISTO_CREDENTIAL_ID``. This is
+    safety-critical for agencies that hold several accounts for the SAME marketplace (one per
+    client): products must NEVER cross accounts. So:
+      * if a credential is pinned → use exactly that;
+      * else, fall back ONLY when there is exactly one matching credential;
+      * if several match → REFUSE (the run must pin a connection) rather than risk the wrong account.
     """
     global _credential_id
     if _credential_id is not None:
         return _credential_id
+    pinned = (os.environ.get("LISTO_CREDENTIAL_ID") or "").strip()
+    if pinned:
+        _credential_id = pinned
+        return _credential_id
+    platform = (os.environ.get("LISTO_PLATFORM") or "amazon").strip().lower()
     creds = _request("GET", "/v1/credentials") or []
-    for entry in creds:
-        if isinstance(entry, dict) and entry.get("marketplace") == "amazon":
-            _credential_id = str(entry["id"])
-            return _credential_id
+    matching = [str(e["id"]) for e in creds if isinstance(e, dict) and e.get("marketplace") == platform]
+    if len(matching) == 1:
+        _credential_id = matching[0]
+        return _credential_id
+    if not matching:
+        raise RuntimeError(
+            f"No {platform} connection found in the Listo vault. Connect one in Listo before running."
+        )
     raise RuntimeError(
-        "No Amazon credential found in the Listo vault. Store your Amazon SP-API "
-        "credentials in Listo (marketplace 'amazon') before running the engine via "
-        "the gateway."
+        f"{len(matching)} {platform} connections exist — this run must pin ONE connection "
+        "(set LISTO_CREDENTIAL_ID) so products never land in the wrong account. "
+        "Pick the connection at session start."
     )
 
 

@@ -323,6 +323,9 @@ def main() -> None:
 
     api_url = env.get("LISTO_API_URL", DEFAULT_API_URL)
     api_key = env["LISTO_API_KEY"]
+    # The marketplace the session picked (W7) — scopes the brain + engine pull. Defaults to amazon
+    # so the existing single-marketplace flow is unchanged when nothing is pinned.
+    marketplace = (env.get("LISTO_PLATFORM") or "amazon").strip().lower() or "amazon"
 
     # Engine: an explicit LISTO_ENGINE_DIR is a user-managed override (dev); otherwise
     # auto-provision the snapshot into ~/.listo/engine so onboarding needs only the key.
@@ -331,13 +334,13 @@ def main() -> None:
         engine_dir = pathlib.Path(override).expanduser()
         engine_source = "override"
     else:
-        engine_dir = provision_engine(api_url, api_key, DEFAULT_ENGINE_DIR)
+        engine_dir = provision_engine(api_url, api_key, DEFAULT_ENGINE_DIR, marketplace=marketplace)
         engine_source = "auto"
 
     # Harden the engine project's Claude settings so opening it can't egress to SP-API.
     harden_engine_claude_settings(engine_dir)
 
-    bundle = fetch_brain(api_url, api_key)
+    bundle = fetch_brain(api_url, api_key, marketplace=marketplace)
 
     # Reference copy for debugging.
     brain_dir = pathlib.Path(env.get("LISTO_BRAIN_DIR", ".listo"))
