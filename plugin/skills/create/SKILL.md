@@ -101,16 +101,17 @@ SOP+CONFIG for the Amazon checkpoints), plus the run context, and run it with th
   node is written into the listing as `recommended_browse_nodes`. The CP2 summary names type AND exact
   category together for every group. If a match is low-confidence, ask the user with the top 2–3 options
   in plain words. Never invent a category.
-  **Then lock the variant structure (before filling):** check the matched category's **allowed** variant
-  depth/themes for this marketplace (Amazon: the product type's allowed `variation_themes` + max native
-  dimensions — never assume), then make a **concrete proposal** mapping CP1's variant axes onto what the
-  category allows. If the feed has more axes than the marketplace natively allows, **fold** the extra one
-  into an allowed axis (e.g. a 4th "wood-foot colour" axis folded into the colour value: "black with
-  oak-coloured foot") and propose exactly that. **Present it VISUALLY** per the engine `CLAUDE.md`
-  VARIANTEN-STRUKTUR format: (1) the category's **actual allowed** dimensions, listed by name (not just
-  "max 3"); (2) an **axis → source** table (which column/feature each axis comes from); (3) a **parent/child
-  tree** of one real series with real values; (4) the counts WITH what they're grouped by. Then discuss and
-  confirm with the user before CP3–CP5.
+  **Then lock the variant structure (before filling) — the allowed themes are QUERIED, never guessed:**
+  get the matched product type's **real allowed** variation themes from the authoritative source — Amazon:
+  `python3 core/product_type_def.py <PRODUCT_TYPE>` (prints the exact `variation_themes` Amazon allows for
+  that type). **Hard-stop:** if it errors or returns an empty list, tell the user the theme can't be verified
+  and ask — **never** assume, invent, or copy an example theme. Then make a **concrete proposal** mapping
+  CP1's variant axes onto one of the **queried** themes; if the feed has more axes than the theme natively
+  allows, **fold** the extra one into an allowed axis (e.g. a 4th "wood-foot colour" folded into the colour
+  value) and propose exactly that. **Present it VISUALLY** per the engine `CLAUDE.md` VARIANTEN-STRUKTUR
+  format: (1) the **queried** allowed themes, listed by name (not "max 3"); (2) an **axis → source** table
+  (which column/feature each axis comes from); (3) a **parent/child tree** of one real series with real
+  values; (4) the counts WITH what they're grouped by. Then discuss and confirm with the user before CP3–CP5.
 - **CP3–CP5 — Parse, map, fill:** pull the category's **full** schema — every attribute (required AND
   optional) WITH its value-lists — and fill **every relevant optional field** for which the feed has data
   or a safe derivation, not just the required minimum (more filled attributes = better ranking +
