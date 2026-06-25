@@ -82,12 +82,13 @@ SOP+CONFIG for the Amazon checkpoints), plus the run context, and run it with th
   yourself — that re-derivation is exactly what turns a sub-second setup into minutes.** If it prints
   `CP1_ok=True`, CP0 is done — go straight to CP1. (If it ever prints `CP1_ok=False`, surface that to
   the user instead of hand-rolling a workaround.)
-- **CP1 — Analyze feed + variant structure:** produce the column mapping AND work out the variant
-  structure in detail (it's foundational — never rush it). Discover **all** variant axes from the data,
-  including **hidden** ones only in the title/name (e.g. a second colour); collision-check (the axes must
-  make every variant unique — if two products collide, an axis is missing → keep looking); derive
-  parent/child (parent = series, child = axis combination). Show a short plain-language summary (products,
-  fields, the variant **axes + parent/child**), not the JSON.
+- **CP1 — Analyze feed:** produce the column mapping + a short plain-language overview (products, fields).
+  Work out the variant structure **internally** (discover all axes incl. **hidden** ones only in the title,
+  collision-check to **0 duplicates**, derive parent/child) but in CP1 only **hint** at it — the detailed,
+  **visual** variant proposal belongs in CP2, after the category is known. Follow the engine `CLAUDE.md`
+  DARSTELLUNG rule in **every** CP: take the user along — show **what** you do, **why**, the concrete **source**
+  (which column/feature), and the **output** as a table/tree; **never** sloppy numbers like "14 parents, 234
+  children" without showing **what they're grouped by** and **from which column/feature**.
 - **CP2 — Category & template:** Use the product groups CP1 already found and resolve the matching Amazon
   product types by **targeted search** — for each group, call the cloud's product-type search with fitting
   keywords (e.g. "aluminium foil", "cling film / Frischhaltefolie", "baking paper / Backpapier"), pick the
@@ -105,8 +106,11 @@ SOP+CONFIG for the Amazon checkpoints), plus the run context, and run it with th
   dimensions — never assume), then make a **concrete proposal** mapping CP1's variant axes onto what the
   category allows. If the feed has more axes than the marketplace natively allows, **fold** the extra one
   into an allowed axis (e.g. a 4th "wood-foot colour" axis folded into the colour value: "black with
-  oak-coloured foot") and propose exactly that. Show the variation theme + parent/child + examples,
-  discuss, and confirm with the user before CP3–CP5.
+  oak-coloured foot") and propose exactly that. **Present it VISUALLY** per the engine `CLAUDE.md`
+  VARIANTEN-STRUKTUR format: (1) the category's **actual allowed** dimensions, listed by name (not just
+  "max 3"); (2) an **axis → source** table (which column/feature each axis comes from); (3) a **parent/child
+  tree** of one real series with real values; (4) the counts WITH what they're grouped by. Then discuss and
+  confirm with the user before CP3–CP5.
 - **CP3–CP5 — Parse, map, fill:** pull the category's **full** schema — every attribute (required AND
   optional) WITH its value-lists — and fill **every relevant optional field** for which the feed has data
   or a safe derivation, not just the required minimum (more filled attributes = better ranking +
