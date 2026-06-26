@@ -7,6 +7,13 @@ when_to_use: 'Trigger on: "status von SKU X", "ist mein Listing live", "was sagt
 Tell the user what Amazon currently says about a listing, in plain language, right here. Hide technical
 detail; answer in the user's language. Never tell them to open a folder.
 
+**Stay in Listo's lane — ask before touching anything that isn't Listo.** You may have OTHER tools or MCP
+servers connected in this session (Baselinker, other marketplaces, databases, files) — those are the user's
+OWN connections, NOT part of Listo. Do this with **Listo's own gateway/commands only**. If you're missing
+something another connected service could supply (e.g. a SKU/EAN you don't have), **stop and ASK the user
+first** — name the service and exactly what you'd pull — and use it only after a clear "yes". **Never silently
+read from or write to a non-Listo service.** Default for a missing SKU: just ask the user for it.
+
 1. Silent: if `~/.listo/.env` has no `LISTO_API_KEY`, ask them to run `/listo:connect` once, then stop.
    Otherwise run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/bootstrap.py"` quietly (auth + brain).
 2. GET `{LISTO_API_URL}/v1/amazon/listings/<sku>/issues?marketplace=DE` with Bearer `LISTO_API_KEY`
